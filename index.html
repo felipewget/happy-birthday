@@ -1,57 +1,25 @@
-<html lang="en">
+<html lang="en" class="">
   <head>
     <meta charset="UTF-8" />
+    <title>CodePen Demo</title>
 
-    <link
-      rel="apple-touch-icon"
-      type="image/png"
-      href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png"
-    />
-    <meta name="apple-mobile-web-app-title" content="CodePen" />
+    <meta name="robots" content="noindex" />
 
     <link
       rel="shortcut icon"
       type="image/x-icon"
       href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico"
     />
-
     <link
       rel="mask-icon"
-      type="image/x-icon"
-      href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg"
+      href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-b4b4269c16397ad2f0f7a01bcdf513a1994f4c94b8af2f191c09eb0d601762b1.svg"
       color="#111"
     />
+    <link rel="canonical" href="https://codepen.io/enxaneta/pen/obJvRy" />
 
-    <title>CodePen - Confetti with HTML `&lt;canvas&gt;`</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
-    />
-
-    <style>
-      h1 {
-        position: absolute;
-        margin-top: 30vh;
-        width: 100%;
-        text-align: center;
-        font-size: 333%;
-        font-family: sans-serif;
-        color: grey;
-        opacity: 0.5;
-      }
-
-      canvas {
-        overflow-y: hidden;
-        overflow-x: hidden;
-        width: 100%;
-        margin: 0;
-      }
-    </style>
-
-    <script>
-      window.console = window.console || function (t) {};
-    </script>
+    <script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeConsoleRunner-6bce046e7128ddf9391ccf7acbecbf7ce0cbd7b6defbeb2e217a867f51485d25.js"></script>
+    <script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRefreshCSS-550eae0ce567d3d9182e33cee4e187761056020161aa87e3ef74dc467972c555.js"></script>
+    <script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRuntimeErrors-4f205f2c14e769b448bcf477de2938c681660d5038bc464e3700256713ebe261.js"></script>
     <style type="text/css">
       .adace-popup-detector,
       .demo-wrapper[style="display:none;"] + div.fadeInDown[id],
@@ -19907,124 +19875,246 @@
         display: block !important;
       }
     </style>
-
-    <script>
-      if (document.location.search.match(/type=embed/gi)) {
-        window.parent.postMessage("resize", "*");
+    <style type="text/css" class="INLINE_PEN_STYLESHEET_ID">
+      @font-face {
+        /*font from https://codepen.io/Nimoi/pen/keaFn*/
+        font-family: "Monoton";
+        font-style: normal;
+        font-weight: 400;
+        src: local("Monoton"), local("Monoton-Regular"),
+          url(https://themes.googleusercontent.com/static/fonts/monoton/v4/AKI-lyzyNHXByGHeOcds_w.woff)
+            format("woff");
       }
-    </script>
+
+      * {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      body {
+        background: radial-gradient(#fec215, #f8a90c);
+      }
+
+      .text {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        font-size: 5vw;
+        text-align: center;
+        margin-top: calc(50vh - 0.5em);
+        font-family: Monoton;
+        color: #000;
+        z-index: -1;
+      }
+    </style>
   </head>
 
-  <body translate="no">
-    <h1>Happy Birthday Lachy!</h1>
-    <canvas id="canvas" width="320" height="443"></canvas>
+  <body>
+    <canvas id="c" width="1479" height="787"></canvas>
+    <div class="text">Happy Birthday Bryce!!!</div>
+
     <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-2c7831bb44f98c1391d6a4ffda0e1fd302503391ca806e7fcc7b9b87197aec26.js"></script>
+    <script>
+      var c = document.getElementById("c");
+      var ctx = c.getContext("2d");
 
-    <script id="rendered-js">
-      let W = window.innerWidth;
-      let H = window.innerHeight;
-      const canvas = document.getElementById("canvas");
-      const context = canvas.getContext("2d");
-      const maxConfettis = 150;
-      const particles = [];
+      var bc = document.createElement("canvas");
+      var bCtx = bc.getContext("2d");
 
-      const possibleColors = [
-        "DodgerBlue",
-        "OliveDrab",
-        "Gold",
-        "Pink",
-        "SlateBlue",
-        "LightBlue",
-        "Gold",
-        "Violet",
-        "PaleGreen",
-        "SteelBlue",
-        "SandyBrown",
-        "Chocolate",
-        "Crimson",
-      ];
+      var cw = (c.width = bc.width = window.innerWidth),
+        cx = cw / 2;
+      var ch = (c.height = bc.height = window.innerHeight + 100),
+        cy = ch;
 
-      function randomFromTo(from, to) {
-        return Math.floor(Math.random() * (to - from + 1) + from);
-      }
+      var frames = 0;
+      var requestId = null;
+      var rad = Math.PI / 180;
+      var kappa = 0.5522847498;
 
-      function confettiParticle() {
-        this.x = Math.random() * W; // x
-        this.y = Math.random() * H - H; // y
-        this.r = randomFromTo(11, 33); // radius
-        this.d = Math.random() * maxConfettis + 11;
-        this.color =
-          possibleColors[Math.floor(Math.random() * possibleColors.length)];
-        this.tilt = Math.floor(Math.random() * 33) - 11;
-        this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-        this.tiltAngle = 0;
+      var x, y;
+      bCtx.strokeStyle = "#abcdef";
+      bCtx.lineWidth = 1;
 
-        this.draw = function () {
-          context.beginPath();
-          context.lineWidth = this.r / 2;
-          context.strokeStyle = this.color;
-          context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-          context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
-          return context.stroke();
-        };
+      var balloons = [];
+
+      function Balloon() {
+        this.r = randomIntFromInterval(20, 70);
+        this.R = 1.4 * this.r;
+        this.x = randomIntFromInterval(this.r, cw - this.r);
+        this.y = ch + 2 * this.r;
+        this.a = this.r * 4.5;
+        this.pm = Math.random() < 0.5 ? -1 : 1;
+        this.speed = randomIntFromInterval(1.5, 4);
+        this.k = this.speed / 5;
+        this.hue = this.pm > 0 ? "210" : "10";
       }
 
       function Draw() {
-        const results = [];
+        updateBallons(bCtx);
 
-        // Magical recursive functional love
-        requestAnimationFrame(Draw);
+        ctx.clearRect(0, 0, cw, ch);
+        var img = bc;
+        ctx.drawImage(img, 0, 0);
 
-        context.clearRect(0, 0, W, window.innerHeight);
+        requestId = window.requestAnimationFrame(Draw);
+      }
+      //requestId = window.requestAnimationFrame(Draw);
 
-        for (var i = 0; i < maxConfettis; i++) {
-          results.push(particles[i].draw());
+      function Init() {
+        if (requestId) {
+          window.cancelAnimationFrame(requestId);
+          requestId = null;
         }
+        (cw = c.width = bc.width = window.innerWidth), (cx = cw / 2);
+        (ch = c.height = bc.height = window.innerHeight + 100), (cy = ch);
+        bCtx.strokeStyle = "#abcdef";
+        bCtx.lineWidth = 1;
+        Draw();
+      }
 
-        let particle = {};
-        let remainingFlakes = 0;
-        for (var i = 0; i < maxConfettis; i++) {
-          particle = particles[i];
+      setTimeout(function () {
+        Init();
+        window.addEventListener("resize", Init, false);
+      }, 15);
 
-          particle.tiltAngle += particle.tiltAngleIncremental;
-          particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-          particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
+      function updateBallons(ctx) {
+        frames += 1;
+        if (frames % 37 == 0 && balloons.length < 37) {
+          var balloon = new Balloon();
+          balloons.push(balloon);
+        }
+        ctx.clearRect(0, 0, cw, ch);
 
-          if (particle.y <= H) remainingFlakes++;
-
-          // If a confetti has fluttered out of view,
-          // bring it back to above the viewport and let if re-fall.
-          if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-            particle.x = Math.random() * W;
-            particle.y = -30;
-            particle.tilt = Math.floor(Math.random() * 10) - 20;
+        for (var i = 0; i < balloons.length; i++) {
+          var b = balloons[i];
+          if (b.y > -b.a) {
+            b.y -= b.speed;
+          } else {
+            b.y = parseInt(ch + b.r + b.R);
           }
+
+          var p = thread(b, ctx);
+          b.cx = p.x;
+          b.cy = p.y - b.R;
+          ctx.fillStyle = Grd(p.x, p.y, b.r, b.hue);
+          drawBalloon(b, ctx);
         }
-
-        return results;
       }
 
-      window.addEventListener(
-        "resize",
-        function () {
-          W = window.innerWidth;
-          H = window.innerHeight;
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        },
-        false
-      );
+      function drawBalloon(b, ctx) {
+        var or = b.r * kappa; // offset
 
-      // Push new confetti objects to `particles[]`
-      for (var i = 0; i < maxConfettis; i++) {
-        particles.push(new confettiParticle());
+        var p1 = {
+          x: b.cx - b.r,
+          y: b.cy,
+        };
+        var pc11 = {
+          x: p1.x,
+          y: p1.y + or,
+        };
+        var pc12 = {
+          x: p1.x,
+          y: p1.y - or,
+        };
+
+        var p2 = {
+          x: b.cx,
+          y: b.cy - b.r,
+        };
+        var pc21 = {
+          x: b.cx - or,
+          y: p2.y,
+        };
+        var pc22 = {
+          x: b.cx + or,
+          y: p2.y,
+        };
+
+        var p3 = {
+          x: b.cx + b.r,
+          y: b.cy,
+        };
+        var pc31 = {
+          x: p3.x,
+          y: p3.y - or,
+        };
+        var pc32 = {
+          x: p3.x,
+          y: p3.y + or,
+        };
+
+        var p4 = {
+          x: b.cx,
+          y: b.cy + b.R,
+        };
+        var pc41 = {
+          x: p4.x + or,
+          y: p4.y,
+        };
+        var pc42 = {
+          x: p4.x - or,
+          y: p4.y,
+        };
+
+        var t1 = {
+          x: p4.x + 0.2 * b.r * Math.cos(70 * rad),
+          y: p4.y + 0.2 * b.r * Math.sin(70 * rad),
+        };
+        var t2 = {
+          x: p4.x + 0.2 * b.r * Math.cos(110 * rad),
+          y: p4.y + 0.2 * b.r * Math.sin(110 * rad),
+        };
+
+        //balloon
+        ctx.beginPath();
+        ctx.moveTo(p4.x, p4.y);
+        ctx.bezierCurveTo(pc42.x, pc42.y, pc11.x, pc11.y, p1.x, p1.y);
+        ctx.bezierCurveTo(pc12.x, pc12.y, pc21.x, pc21.y, p2.x, p2.y);
+        ctx.bezierCurveTo(pc22.x, pc22.y, pc31.x, pc31.y, p3.x, p3.y);
+        ctx.bezierCurveTo(pc32.x, pc32.y, pc41.x, pc41.y, p4.x, p4.y);
+        //knot
+        ctx.lineTo(t1.x, t1.y);
+        ctx.lineTo(t2.x, t2.y);
+        ctx.closePath();
+        ctx.fill();
       }
 
-      // Initialize
-      canvas.width = W;
-      canvas.height = H;
-      Draw();
-      //# sourceURL=pen.js
+      function thread(b, ctx) {
+        ctx.beginPath();
+
+        for (var i = b.a; i > 0; i -= 1) {
+          var t = i * rad;
+          x = b.x + b.pm * 50 * Math.cos(b.k * t - frames * rad);
+          y = b.y + b.pm * 25 * Math.sin(b.k * t - frames * rad) + 50 * t;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        return (p = {
+          x: x,
+          y: y,
+        });
+      }
+
+      function Grd(x, y, r, hue) {
+        grd = ctx.createRadialGradient(
+          x - 0.5 * r,
+          y - 1.7 * r,
+          0,
+          x - 0.5 * r,
+          y - 1.7 * r,
+          r
+        );
+        grd.addColorStop(0, "hsla(" + hue + ",100%,65%,.95)");
+        grd.addColorStop(0.4, "hsla(" + hue + ",100%,45%,.85)");
+        grd.addColorStop(1, "hsla(" + hue + ",100%,25%,.80)");
+        return grd;
+      }
+
+      function randomIntFromInterval(mn, mx) {
+        return ~~(Math.random() * (mx - mn + 1) + mn);
+      }
     </script>
   </body>
 </html>
